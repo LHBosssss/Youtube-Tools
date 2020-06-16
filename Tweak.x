@@ -1,34 +1,55 @@
-/* How to Hook with Logos
-Hooks are written with syntax similar to that of an Objective-C @implementation.
-You don't need to #include <substrate.h>, it will be done automatically, as will
-the generation of a class list and an automatic constructor.
+%group BackgroundPlayback
+	%hook YTSingleVideo
+		- (BOOL)isPlayableInBackground {
+			return YES;
+		}
+	%end
 
-%hook ClassName
+	%hook YTPlaybackData
+		- (BOOL)isPlayableInBackground {
+			return YES;
+		}
+	%end
 
-// Hooking a class method
-+ (id)sharedInstance {
-	return %orig;
-}
+	%hook YTPlaybackBackgroundTaskController
+		- (BOOL)isContentPlayableInBackground {
+			return YES;
+		}
 
-// Hooking an instance method with an argument.
-- (void)messageName:(int)argument {
-	%log; // Write a message about this call, including its class, name and arguments, to the system log.
+	%end
 
-	%orig; // Call through to the original function with its original arguments.
-	%orig(nil); // Call through to the original function with a custom argument.
+	%hook YTIPlayerResponse
+		- (BOOL)isPlayableInBackground {
+			return YES;
+		}
+	%end
 
-	// If you use %orig(), you MUST supply all arguments (except for self and _cmd, the automatically generated ones.)
-}
+	%hook YTIPlayabilityStatus
+		- (BOOL)isPlayableInBackground {
+			return YES;
+		}
 
-// Hooking an instance method with no arguments.
-- (id)noArguments {
-	%log;
-	id awesome = %orig;
-	[awesome doSomethingElse];
+	%end
 
-	return awesome;
-}
-
-// Always make sure you clean up after yourself; Not doing so could have grave consequences!
+	%hook YTPlaybackBackgroundTaskController
+		- (void)setContentPlayableInBackground: (BOOL)arg {
+			%orig(YES);
+		}
+	%end
 %end
-*/
+
+%group BlockAds
+	@interface YTAdsControlFlowPlaybackCoordinator
+		- (void)adSlotDidComplete;
+	@end
+	%hook YTAdsControlFlowPlaybackCoordinator
+		- (void)startOverlay {
+			[self adSlotDidComplete];
+		}
+	%end
+%end
+
+%ctor {
+	%init(BackgroundPlayback);
+	%init(BlockAds);
+}

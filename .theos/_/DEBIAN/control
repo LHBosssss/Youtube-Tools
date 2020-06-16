@@ -1,9 +1,10 @@
 Package: com.hdl.youtubetools
 Name: Youtube Tools
 Depends: mobilesubstrate
-Version: 0.0.1
 Architecture: iphoneos-arm
 Description: An awesome MobileSubstrate tweak!
 Maintainer: hdl
 Author: hdl
 Section: Tweaks
+Version: 0.0.1-9
+Installed-Size: 56
